@@ -20,7 +20,7 @@ my $sc=0;
 
 sub getProfiles($) {
 	my $home=shift;
-	open(my $FP, '<'.$home.'/.mozilla/firefox/profiles.ini') || die;
+	open(my $FP, '<'.$home.'/.mozilla/firefox/profiles.ini') || return undef;
 	my %profiles;
 	my $profileId;
 	my $ct=0;
@@ -59,7 +59,7 @@ sub getProfiles($) {
 	return undef;
 }
 
-my $path=getProfiles($ARGV[1] || $ENV{'HOME'});
+my $path=getProfiles($ARGV[0] || $ENV{'HOME'});
 if (!$path) {
 	printf "No Firefox profiles found.\n";
 	exit 1;
@@ -74,7 +74,8 @@ while(<DATA>) {
 }
 open(my $FP, "<".$path."/prefs.js");
 open(my $OFP, ">".$path."/prefs-new.js");
-while(<$FP>) { if (/^user_pref/) {
+while(<$FP>) {
+	if (/^user_pref/) {
 		$sc++;
 		my @a=split(/[",]/,$_,4);
 		$a[3]=~s/^ //;
